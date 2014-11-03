@@ -4,7 +4,7 @@
     "short_name": "Umbraco",
     "description": "Productivity tool for Umbraco developers",
     "author": "Umbraco HQ",
-    "version": "1.0.1",
+    "version": "1.0.2",
 	"background": {
 		"page": "popup.html"
 	},
