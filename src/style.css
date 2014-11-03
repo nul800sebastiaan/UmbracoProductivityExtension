@@ -2,3 +2,6 @@
     width: 200px;
     margin-bottom: 4px;
 }
+.hide {
+	display: none;
+}
