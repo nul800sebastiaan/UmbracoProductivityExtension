@@ -5,6 +5,9 @@
     "description": "Productivity tool for Umbraco developers",
     "author": "Umbraco HQ",
     "version": "1.0.1",
+	"background": {
+		"page": "popup.html"
+	},
     "options_page": "options.html",
     "icons": {
         "16": "icon16.png",
