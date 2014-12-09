@@ -10,6 +10,7 @@ function popup() {
     document.getElementById('button-umbraco').addEventListener('click', handleClickUmbraco);
     document.getElementById('button-trace').addEventListener('click', handleClickTrace);
     document.getElementById('button-debug-trace').addEventListener('click', handleClickDebugShowTrace);
+    document.getElementById('button-our').addEventListener('click', handleClickOur);
 
     var openBackofficeInNewTab;
     var showDebugShowTrace;
@@ -76,6 +77,11 @@ function popup() {
             chrome.tabs.update(tab.id, { url: newUrl });
             hidePopup();
         });
+    };
+
+    function handleClickOur() {
+        chrome.tabs.create({ url: "http://our.umbraco.org/" });
+        hidePopup();
     };
 
     function hidePopup() {
