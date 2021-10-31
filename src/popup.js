@@ -26,15 +26,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // when a button is clicked, this event listener will respond
 function click(e) {
-    chrome.tabs.getSelected(null, function (tab) {
-        var arr = tab.url.split('/');
+    chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+        let url = tabs[0].url;
+        let tabId = tabs[0].id;
+
+        var arr = url.split('/');
         var newUrl = arr[0] + '//' + arr[2];
 
         if (e.target.id === "backoffice") {
             newUrl = newUrl + "/umbraco";
-            openUrl(newUrl, tab.id, openBackofficeInNewTab);
+            openUrl(newUrl, tabId, openBackofficeInNewTab);
         } else {
-            openUrl(newUrl, tab.id, false);
+            openUrl(newUrl, tabId, false);
         }
     });
 }
