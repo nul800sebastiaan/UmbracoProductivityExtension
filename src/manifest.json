@@ -1,7 +1,7 @@
 {
   "name": "Umbraco Productity",
   "description": "Productivity tool for Umbraco developers",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "manifest_version": 3,
   "icons": {
     "16": "/images/icon16.png",
