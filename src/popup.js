@@ -1,14 +1,18 @@
 "use strict";
 
-// set config options based on stored config
 var openBackofficeInNewTab;
+var openFrontendInNewTab;
+var backofficeSlug = "umbraco";
 
+// set config options based on stored config
 chrome.storage.sync.get({
+    openFrontendInNewTab: false,
     openBackofficeInNewTab: false,
     hideLogos: false,
     showMiniProfiler: false
 }, function (items) {
     openBackofficeInNewTab = items.openBackofficeInNewTab;
+    openFrontendInNewTab = items.openFrontendInNewTab;
 
     if (!items.hideLogos) {
         document.getElementById("logos").style.display = "flex";
@@ -34,27 +38,65 @@ function click(e) {
         let tabId = tabs[0].id;
 
         var arr = url.split("/");
+        // [0] will contain "http" or "https"
+        // [1] will contain an empty string, there is nothing between the first and second "/"
+        // [2] will contain the domain name like "umbraco.com"
         var newUrl = arr[0] + "//" + arr[2];
+        var firstSlug = arr[3];
 
         switch (e.target.id) {
             case "backoffice":
                 // when clicking the backoffice button, append /umbraco to the clean URL
-                newUrl = newUrl + "/umbraco";
-                openUrl(newUrl, tabId, openBackofficeInNewTab);
+                newUrl = newUrl + "/" + backofficeSlug;
+                openUrl(newUrl, tabId, firstSlug);
                 break;
             case "miniprofiler":
                 // when clicking the miniprofiler button add the ?umbDebug=true querystring to the current URL
                 newUrl = UpdateQueryString("umbDebug", "true", newUrl);
-                openUrl(newUrl, tabId, false);
+                openUrl(newUrl, tabId, firstSlug);
                 break;
             default:
-                openUrl(newUrl, tabId, false);
+                openUrl(newUrl, tabId, firstSlug);
         }
     });
 }
 
-function openUrl(newUrl, tabId, newTab) {
-    if (newTab) {
+function openUrl(newUrl, tabId, firstSlug) {
+    var inBackoffice = false;
+    var inFrontend = false;
+    var openLinkInNewTab = false;
+
+    if (firstSlug && firstSlug.startsWith(backofficeSlug)) {
+        inBackoffice = true;
+    } else {
+        inFrontend = true;
+    }
+
+    var arr = newUrl.split("/");
+    var destinationFirstSlug = arr[3];
+    var destinationIsBackoffice = false;
+    var destinationIsFrontend = false;
+    if (destinationFirstSlug && destinationFirstSlug.startsWith(backofficeSlug)) {
+        destinationIsBackoffice = true;
+    } else {
+        destinationIsFrontend = true;
+    }
+
+    if (openFrontendInNewTab && inBackoffice) {
+        if (destinationIsFrontend) {
+            // we're going from backoffice to frontend, open in new tab
+            openLinkInNewTab = true;
+        }
+    }
+
+    if (openBackofficeInNewTab && inFrontend) {
+        if (destinationIsBackoffice) {
+            // we're going from frontend to backoffice, open in new tab
+            openLinkInNewTab = true;
+        }
+    }
+
+    if (openLinkInNewTab) {
         chrome.tabs.create({ url: newUrl });
     } else {
         chrome.tabs.update(tabId, { url: newUrl });
