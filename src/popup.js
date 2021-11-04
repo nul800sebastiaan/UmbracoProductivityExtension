@@ -1,26 +1,29 @@
-'use strict';
+"use strict";
 
 // set config options based on stored config
 var openBackofficeInNewTab;
-var hideLogos;
 
 chrome.storage.sync.get({
     openBackofficeInNewTab: false,
-    hideLogos: false
+    hideLogos: false,
+    showMiniProfiler: false
 }, function (items) {
     openBackofficeInNewTab = items.openBackofficeInNewTab;
-    hideLogos = items.hideLogos;
 
-    if (!hideLogos) {
-        document.getElementById('logos').style.display = 'flex';
+    if (!items.hideLogos) {
+        document.getElementById("logos").style.display = "flex";
+    }
+
+    if (!items.showMiniProfiler) {
+        document.getElementById("miniprofiler").style.display = "none";
     }
 });
 
 // find all buttons and add a click event listener
-document.addEventListener('DOMContentLoaded', function () {
-    var divs = document.querySelectorAll('button');
+document.addEventListener("DOMContentLoaded", function () {
+    var divs = document.querySelectorAll("button");
     for (var i = 0; i < divs.length; i++) {
-        divs[i].addEventListener('click', click);
+        divs[i].addEventListener("click", click);
     }
 });
 
@@ -30,14 +33,22 @@ function click(e) {
         let url = tabs[0].url;
         let tabId = tabs[0].id;
 
-        var arr = url.split('/');
-        var newUrl = arr[0] + '//' + arr[2];
+        var arr = url.split("/");
+        var newUrl = arr[0] + "//" + arr[2];
 
-        if (e.target.id === "backoffice") {
-            newUrl = newUrl + "/umbraco";
-            openUrl(newUrl, tabId, openBackofficeInNewTab);
-        } else {
-            openUrl(newUrl, tabId, false);
+        switch (e.target.id) {
+            case "backoffice":
+                // when clicking the backoffice button, append /umbraco to the clean URL
+                newUrl = newUrl + "/umbraco";
+                openUrl(newUrl, tabId, openBackofficeInNewTab);
+                break;
+            case "miniprofiler":
+                // when clicking the miniprofiler button add the ?umbDebug=true querystring to the current URL
+                newUrl = UpdateQueryString("umbDebug", "true", newUrl);
+                openUrl(newUrl, tabId, false);
+                break;
+            default:
+                openUrl(newUrl, tabId, false);
         }
     });
 }
@@ -53,4 +64,30 @@ function openUrl(newUrl, tabId, newTab) {
     setTimeout(function () {
         window.close();
     }, 300);
+}
+
+// adapted from: https://stackoverflow.com/a/21784228/5018
+function UpdateQueryString(key, value, url) {
+    var result = null;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi");
+
+    if (re.test(url)) {
+        if (typeof value !== "undefined" && value !== null) result = url.replace(re, "$1" + key + "=" + value + "$2$3");
+        else {
+            var hash = url.split("#");
+            url = hash[0].replace(re, "$1$3").replace(/(&|\?)$/, "");
+            if (typeof hash[1] !== "undefined" && hash[1] !== null) url += "#" + hash[1];
+            result = url;
+        }
+    } else {
+        if (typeof value !== "undefined" && value !== null) {
+            var separator = url.indexOf("?") !== -1 ? "&" : "?",
+                hash = url.split("#");
+            url = hash[0] + separator + key + "=" + value;
+            if (typeof hash[1] !== "undefined" && hash[1] !== null) url += "#" + hash[1];
+            result = url;
+        } else result = url;
+    }
+
+    return result;
 }

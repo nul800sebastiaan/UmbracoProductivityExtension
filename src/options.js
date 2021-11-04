@@ -1,11 +1,17 @@
+var openInNewTabCheckbox;
+var hideLogosCheckbox;
+var showMiniProfilerCheckbox;
+
 // Saves options to chrome.storage
 function save_options() {
-    var openBackofficeInNewTabValue = document.getElementById("backoffice-new-tab").checked;
-    var hideLogos = document.getElementById("hide-logos").checked;
+    var openBackofficeInNewTabValue = openInNewTabCheckbox.checked;
+    var hideLogosValue = hideLogosCheckbox.checked;
+    var showMiniProfilerValue = showMiniProfilerCheckbox.checked;
 
     chrome.storage.sync.set({
         openBackofficeInNewTab: openBackofficeInNewTabValue,
-        hideLogos: hideLogos
+        hideLogos: hideLogosValue,
+        showMiniProfiler: showMiniProfilerValue
     }, function () {
         // Update status to let user know options were saved.
         var status = document.getElementById("status");
@@ -19,13 +25,19 @@ function save_options() {
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
+    openInNewTabCheckbox = document.getElementById("backoffice-new-tab")
+    hideLogosCheckbox = document.getElementById("hide-logos");
+    showMiniProfilerCheckbox = document.getElementById("show-mini-profiler");
+
     // Use default value color = "red" and likesColor = true.
     chrome.storage.sync.get({
         openBackofficeInNewTab: false,
         hideLogos: false,
+        showMiniProfiler: false
     }, function (items) {
-        document.getElementById("backoffice-new-tab").checked = items.openBackofficeInNewTab
-        document.getElementById("hide-logos").checked = items.hideLogos;
+        openInNewTabCheckbox.checked = items.openBackofficeInNewTab
+        hideLogosCheckbox.checked = items.hideLogos;
+        showMiniProfilerCheckbox.checked = items.showMiniProfiler;
     });
 }
 
