@@ -45,9 +45,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                     var exceptionType = response.ysod.ExceptionType.replace(/'/g, "").replace(/"/g, "");
                     var message = response.ysod.Message.replace(/'/g, "").replace(/"/g, "");
 
-                    var stackTraceExcerpt = response.ysod.StackTrace;
+                    var stackTraceExcerpt = response.ysod.StackTrace.replace(/'/g, "").replace(/"/g, "");
                     if (stackTraceExcerpt.indexOf("\n") !== -1) {
-                        stackTraceExcerpt = response.ysod.StackTrace.substring(0, response.ysod.StackTrace.indexOf("\n")).replace(/'/g, "").replace(/"/g, "");
+                        stackTraceExcerpt = response.ysod.StackTrace.substring(0, response.ysod.StackTrace.indexOf("\n"));
                     }
 
                     var searchUrl = "https://google.com/search?q=\"umbraco\"+" + encodeURIComponent(exceptionType + " " + message + " " + stackTraceExcerpt);
