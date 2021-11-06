@@ -40,8 +40,8 @@ function restore_options() {
         hideLogos: false,
         showMiniProfiler: false
     }, function (items) {
-        openBackofficeInNewTabCheckbox.checked = items.openBackofficeInNewTab
-        openFrontendInNewTabCheckbox.checked = items.openFrontendInNewTab
+        openBackofficeInNewTabCheckbox.checked = items.openBackofficeInNewTab;
+        openFrontendInNewTabCheckbox.checked = items.openFrontendInNewTab;
         hideLogosCheckbox.checked = items.hideLogos;
         showMiniProfilerCheckbox.checked = items.showMiniProfiler;
     });

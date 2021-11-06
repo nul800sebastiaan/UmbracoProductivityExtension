@@ -21,6 +21,8 @@ chrome.storage.sync.get({
     if (!items.showMiniProfiler) {
         document.getElementById("miniprofiler").style.display = "none";
     }
+
+    document.getElementById("searcherror").style.display = "none";
 });
 
 // find all buttons and add a click event listener
@@ -29,6 +31,30 @@ document.addEventListener("DOMContentLoaded", function () {
     for (var i = 0; i < divs.length; i++) {
         divs[i].addEventListener("click", click);
     }
+});
+
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { greeting: "checkForError" }, function (response) {
+
+        if (response.ysod !== null) {
+            var searchButton = document.getElementById("searcherror");
+            searchButton.style.display = "inline-block";
+            searchButton.addEventListener("click",
+                function () {
+                    // on all strings, replace single and double quotes to get less narrow results - .replace(/'/g, "").replace(/"/g, "");
+                    var exceptionType = response.ysod.ExceptionType.replace(/'/g, "").replace(/"/g, "");
+                    var message = response.ysod.Message.replace(/'/g, "").replace(/"/g, "");
+
+                    var stackTraceExcerpt = response.ysod.StackTrace;
+                    if (stackTraceExcerpt.indexOf("\n") !== -1) {
+                        stackTraceExcerpt = response.ysod.StackTrace.substring(0, response.ysod.StackTrace.indexOf("\n")).replace(/'/g, "").replace(/"/g, "");
+                    }
+
+                    var searchUrl = "https://google.com/search?q=\"umbraco\"+" + encodeURIComponent(exceptionType + " " + message + " " + stackTraceExcerpt);
+                    window.open(searchUrl, "_blank");
+                });
+        }
+    });
 });
 
 // when a button is clicked, this event listener will respond
